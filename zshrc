@@ -93,10 +93,3 @@ if [ -x /usr/bin/dircolors ]; then
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
-
-http_proxy=http://proxy.tencent.com:8080
-export http_proxy
-https_proxy=https://proxy.tencent.com:8080
-export https_proxy
-git_proxy=https://proxy.tencent.com:8080
-export git_proxy
