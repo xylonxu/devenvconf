@@ -1,0 +1,89 @@
+#!/bin/bash
+#chkconfig:
+#description: Startup and shutdown script for zookeeper cluster
+
+PROGROOT=/usr/local/websrv/zookeeper
+PROGNAME=zkServer.sh
+CLUSTERDIRS=(zk1 zk2 zk3)
+DESC="zookeeper cluster daemon"
+SCRIPTNAMEE=/etc/init.d/zkpd
+
+PIDROOT=$PROGROOT/data
+PIDDIRS=(zk1 zk2 zk3)
+PIDFNAME=zookeeper_server.pid
+
+export ZOO_LOG_DIR=$PROGROOT/log
+
+
+start()
+{
+    for ZKDIR in ${CLUSTERDIRS[@]}
+    do
+        DAEMON=$PROGROOT/$ZKDIR/bin/$PROGNAME
+        if test -x $DAEMON
+        then
+            echo -e "Starting $DESC: $ZKDIR/bin/$PROGNAME"
+            if $DAEMON start
+            then
+                echo -e "OK"
+            else
+                echo -e "failed"
+            fi
+        else
+            echo -e "Couldn't find Zookeeper Server ($DAEMON)"
+        fi
+    done
+}
+
+stop()
+{
+    for PIDDIR in ${PIDDIRS[@]}
+    do
+        PIDFILE=$PIDROOT/$PIDDIR/$PIDFNAME
+        if test -e $PIDFILE
+        then
+            echo -e "Stopping $DESC: $PROGNAME"
+            if kill `cat $PIDFILE`
+            then
+                echo -e "OK"
+                echo -e "kill process" `cat $PIDFILE`
+            else
+                echo -e "failed"
+            fi
+        else
+            echo -e "No Zookeeper Server running"
+        fi
+    done
+}
+
+restart()
+{
+    echo -e "Restarting $DESC: $PROGNAME"
+    stop
+    start
+}
+
+list()
+{
+    ps aux|grep zoo |grep -v grep
+}
+
+case $1 in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    list)
+        list
+        ;;
+    *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|list}" >&2
+        exit 1
+        ;;
+esac
+exit 0
