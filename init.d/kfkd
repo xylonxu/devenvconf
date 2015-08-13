@@ -1,0 +1,86 @@
+#!/bin/bash
+#chkconfig:
+#description: Startup and shutdown script for zookeeper cluster
+
+PROGROOT=/usr/local/websrv/kafka
+PROGNAME=kafka-server-start.sh
+CLUSTERDIRS=(kafka_1 kafka_2 kafka_3)
+DESC="kafka cluster daemon"
+SCRIPTNAMEE=/etc/init.d/kfkd
+
+PIDROOT=$PROGROOT/data
+PIDDIRS=(kafka1 kafka2 kafka3)
+PIDFNAME=kafka_server.pid
+
+start()
+{
+    for KAFKADIR in ${CLUSTERDIRS[@]}
+    do
+        DAEMON=$PROGROOT/$KAFKADIR/bin/$PROGNAME
+        if test -x $DAEMON
+        then
+            echo -e "Starting $DESC: $KAFKADIR/bin/$PROGNAME"
+            if $DAEMON $PROGROOT/$KAFKADIR/config/server.properties > /dev/null 2>&1 &
+            then
+                echo -e "OK"
+            else
+                echo -e "failed"
+            fi
+        else
+            echo -e "Couldn't find Kafka Server ($DAEMON)"
+        fi
+    done
+}
+
+stop()
+{
+    for PIDDIR in ${PIDDIRS[@]}
+    do
+        PIDFILE=$PIDROOT/$PIDDIR/$PIDFNAME
+        if test -e $PIDFILE
+        then
+            echo -e "Stopping $DESC: $PROGNAME"
+            if kill `cat $PIDFILE`
+            then
+                echo -e "OK"
+                echo -e "kill process" `cat $PIDFILE`
+            else
+                echo -e "failed"
+            fi
+        else
+            echo -e "No Kafka Server running"
+        fi
+    done
+}
+
+restart()
+{
+    echo -e "Restarting $DESC: $PROGNAME"
+    stop
+    start
+}
+
+list()
+{
+    ps aux|grep kafka |grep -v grep
+}
+
+case $1 in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    list)
+        list
+        ;;
+    *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|list}" >&2
+        exit 1
+        ;;
+esac
+exit 0

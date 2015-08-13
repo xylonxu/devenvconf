@@ -7,8 +7,7 @@ PROGNAME=bin/storm
 
 NIMBUSDIR=storm-nimbus
 SUPERVISORDIRS=(
-    storm-supervisor1
-    storm-supervisor2
+    storm-supervisor
 )
 DESC="storm cluster daemon"
 SCRIPTNAME=/etc/init.d/stormd

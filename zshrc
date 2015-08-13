@@ -101,3 +101,6 @@ if [ -x /usr/bin/dircolors ]; then
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
+
+export HTTP_PROXY="http://proxy.tencent.com:8080"
+export HTTPS_PROXY="http://proxy.tencent.com:8080"
