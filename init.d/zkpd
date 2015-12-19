@@ -4,56 +4,48 @@
 
 PROGROOT=/usr/local/websrv/zookeeper
 PROGNAME=zkServer.sh
-CLUSTERDIRS=(zk1 zk2 zk3)
 DESC="zookeeper cluster daemon"
 SCRIPTNAMEE=/etc/init.d/zkpd
 
-PIDROOT=$PROGROOT/data
-PIDDIRS=(zk1 zk2 zk3)
+PIDROOT=/data/storage/zookeeper
 PIDFNAME=zookeeper_server.pid
 
-export ZOO_LOG_DIR=$PROGROOT/log
+export ZOO_LOG_DIR=/data/logs/zookeeper
 
 
 start()
 {
-    for ZKDIR in ${CLUSTERDIRS[@]}
-    do
-        DAEMON=$PROGROOT/$ZKDIR/bin/$PROGNAME
-        if test -x $DAEMON
+    DAEMON=$PROGROOT/bin/$PROGNAME
+    if test -x $DAEMON
+    then
+        echo -e "Starting $DESC: $DAEMON"
+        if $DAEMON start
         then
-            echo -e "Starting $DESC: $ZKDIR/bin/$PROGNAME"
-            if $DAEMON start
-            then
-                echo -e "OK"
-            else
-                echo -e "failed"
-            fi
+            echo -e "OK"
         else
-            echo -e "Couldn't find Zookeeper Server ($DAEMON)"
+            echo -e "failed"
         fi
-    done
+    else
+        echo -e "Couldn't find Zookeeper Server ($DAEMON)"
+    fi
 }
 
 stop()
 {
-    for PIDDIR in ${PIDDIRS[@]}
-    do
-        PIDFILE=$PIDROOT/$PIDDIR/$PIDFNAME
-        if test -e $PIDFILE
+    PIDFILE=$PIDROOT/$PIDFNAME
+    if test -e $PIDFILE
+    then
+        echo -e "Stopping $DESC: $PROGNAME"
+        if kill `cat $PIDFILE`
         then
-            echo -e "Stopping $DESC: $PROGNAME"
-            if kill `cat $PIDFILE`
-            then
-                echo -e "OK"
-                echo -e "kill process" `cat $PIDFILE`
-            else
-                echo -e "failed"
-            fi
+            echo -e "OK"
+            echo -e "kill process" `cat $PIDFILE`
         else
-            echo -e "No Zookeeper Server running"
+            echo -e "failed"
         fi
-    done
+    else
+        echo -e "No Zookeeper Server running"
+    fi
 }
 
 restart()
