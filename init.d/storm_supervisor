@@ -1,0 +1,72 @@
+#!/bin/bash
+#chkconfig:
+#description: Startup and Shutdown script for storm cluster
+
+PROGDIR=/usr/local/websrv/storm
+PROGNAME=bin/storm
+
+DESC="storm daemon"
+SCRIPTNAME=/etc/init.d/storm_supervisor
+
+start(){
+    SUPERVISORDAEMON=$PROGDIR/$PROGNAME
+    if test -x "$SUPERVISORDAEMON"
+    then
+        echo -e "Starting $DESC: $SUPERVISORDAEMON supervisor"
+        if $SUPERVISORDAEMON supervisor >/dev/null 2>&1 &
+        then
+            echo -e "OK"
+        else
+            echo -e "failed"
+        fi
+    else
+        echo -e "Couldn't find Storm Supervisor Server($SUPERVISORDAEMON)"
+    fi
+}
+
+stop()
+{
+    for PID in `ps axu|grep bin/storm|grep -v grep|awk '{print $2}'`
+    do
+        echo -e "Stoping $DESC: pid=$PID"
+        if kill $PID
+        then
+            echo -e "OK"
+        else
+            echo -e "failed"
+        fi
+    done
+}
+
+restart()
+{
+    echo -e "Restart $DESC"
+    stop
+    start
+}
+
+list()
+{
+    ps aux | grep bin/storm | grep -v grep
+}
+
+case $1 in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    list)
+        list
+        ;;
+
+    *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|list}" >&2
+        exit 1
+        ;;
+esac
+exit 0
