@@ -30,8 +30,12 @@ if [ -d /etc/profile.d ]; then
 fi
 
 # custom settings
+# java configuration
 export JAVA_HOME=/usr/local/tool/jdk
 export CLASSPATH=.:/usr/local/tool/jdk/lib/:$JAVA_HOME/jre/lib;
+
+# hadoop configuration
+export HADOOP_PREFIX=/usr/local/websrv/hadoop
 
 # kafka configuration
 export KAFKA_HOME=/usr/local/websrv/kafka
