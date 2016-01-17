@@ -156,7 +156,7 @@ values."
    dotspacemacs-loading-progress-bar t
    ;; If non nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
-   dotspacemacs-fullscreen-at-startup t
+   dotspacemacs-fullscreen-at-startup nil
    ;; If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
    ;; Use to disable fullscreen animations in OSX. (default nil)
    dotspacemacs-fullscreen-use-non-native nil
@@ -196,6 +196,10 @@ values."
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
    dotspacemacs-default-package-repository nil
+   ;; Delete whitespace while saving buffer. Possible values are `all',
+   ;; `trailing',  `changed'  or `nil'. Default is `changed' (cleanup whitespace
+   ;; on changed lines) (default 'changed)
+   dotspacemacs-whitespace-cleanup 'changed
    ))
 
 (defun dotspacemacs/user-init ()
@@ -203,6 +207,14 @@ values."
 It is called immediately after `dotspacemacs/init'.  You are free to put any
 user code."
   (global-linum-mode t)
+
+  ;;insert space after ','
+  (global-set-key (kbd ",")
+                  (lambda ()
+                      (interactive) (insert ", ")))
+  ;;高亮括号配对
+  (show-paren-mode t)
+  (setq show-paren-style 'parenthesis)
 )
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -211,10 +223,17 @@ layers configuration. You are free to put any user code."
   ;;(setq powerline-default-separator 'nil)
 
   ;; ycmd layer default configuration
-  (set-variable 'ycmd-server-command '("python" "/usr/local/tool/ycmd/ycmd"))
-  (set-variable 'ycmd-global-config "~/.emacs.d/contrib/ycmd/global_conf.py")
+  (setq ycmd-tag-files 'auto)
+  (setq ycmd-request-message-level -1)
+  (set-variable 'ycmd-server-command '("python" ,(expand-file-name "/usr/local/tool/ycmd/ycmd/__main__.py")))
+  ;;(set-variable 'ycmd-global-config "~/.emacs.d/contrib/ycmd/global_conf.py")
+  (eval-after-load 'ycmd
+    '(spacemacs|hide-lighter ycmd-mode))
   (set-variable 'ycmd-extra-conf-whitelist '("~/Develop/DevConfig"))
   (set-variable 'ycmd-extra-conf-handler 'load)
+
+  (setq-default indent-tabs-mode nil
+        tab-width 4)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
